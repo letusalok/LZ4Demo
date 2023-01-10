@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LZ4DECODE</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <script type="text/javascript" src="../assets/lz4.js"></script>
+	<script type="text/javascript">
+	var Buffer = require('buffer').Buffer
+	var LZ4 = require('lz4')
+  function encodeBlock () {
+	// Nodejs-like Buffer built-in
+
+
+// Some data to be compressed
+var data = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+//var data = 'JUVGJUJGJUJEWExvcmVtJTIwaXBzdW0lMjBkb2xvciUyMHNpdCUyMGFtZXQlMkMlMjBjb25zZWN0ZXR1ciUyMGFkaXBpc2ljaW5nJTIwZWxpdCUyQyUyMHNlZCUyMGRvJTIwZWl1c21vZCUyMHRlbXBvciUyMGluY2lkaWR1bnQlMjB1dCUyMGxhYm9yZSUyMGV0JTVDJTAwJUVGJUJGJUJEJTAwZSUyMG1hZ25hJTIwYWxpcXVhLg=='
+//var data ='11111111101010101010101010100101010101010101'
+data += data
+// LZ4 can only work on Buffers
+var input = Buffer.from(data)
+// Initialize the output buffer to its maximum length based on the input data
+var output = Buffer.alloc( LZ4.encodeBound(input.length) )
+
+// block compression (no archive format)
+var compressedSize = LZ4.encodeBlock(input, output)
+// remove unnecessary bytes
+output = output.slice(0, compressedSize)
+var outputB64 = btoa( encodeURIComponent(output) )
+console.log( "64", outputB64)
+console.log( "compressed data", output )
+
+// block decompression (no archive format)
+var uncompressed = Buffer.alloc(input.length)
+var uncompressedSize = LZ4.decodeBlock(output, uncompressed)
+uncompressed = uncompressed.slice(0, uncompressedSize)
+
+console.log( "uncompressed data", uncompressed )
+  }
+	</script>
+    <app-root></app-root>
+</body>
+</html>
